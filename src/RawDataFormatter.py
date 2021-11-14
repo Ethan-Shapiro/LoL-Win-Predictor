@@ -12,21 +12,25 @@ class RawDataFormatter():
         self._data = {}
         self._summoner_name = summoner_name
 
-    def format_data(self, raw_timelines: list) -> dict:
+    def format_data(self, raw_timelines: list) -> pandas.DataFrame:
         for timeline in raw_timelines:
 
-            # Participants only need to be processed once at the 15 minute mark
+            # Determine each player's team first
             player_teams = self.determine_teams(
                 timeline['info']['frames'][0]['participantFrames'])
 
-            players_15_min = timeline['info']['frames'][16]['participantFrames']
-
-            player_data = self.process_participants(players_15_min)
+            # Participants only need to be processed once at the 15 minute mark
+            player_data = self.process_participants(
+                timeline['info']['frames'][16]['participantFrames'], player_teams)
+            print(player_data)
 
             # send the frames for event data to be processed
-            event_data = self.process_events(timeline)
+            event_data = self.process_events(
+                timeline['info']['frames'], player_teams)
+            print(event_data)
 
             # Combines the above data into a dictionary of lists
+
 
     def process_participants(self, participants: list, player_team_map: dict) -> dict:
         """
@@ -36,32 +40,30 @@ class RawDataFormatter():
 
         red_keys = [x.replace('blue', 'red') for x in blue_keys]
 
+        blank_keys = ['_gold', '_cs', '_xp', '_jg']
+
         all_keys = blue_keys + red_keys
 
         team_data = {k: 0 for k in all_keys}
         for id in participants:
             # Add appropriate values depending on team
-            if player_team_map[id] == self.BLUE_TEAM_ID:
-                keys = blue_keys
-            else:
-                keys = red_keys
+            team = player_team_map[id]
 
             # Add Gold
-            team_data[keys[0]] += participants[id]['totalGold']
+            team_data[team+blank_keys[0]] += participants[id]['totalGold']
 
             # Add minions killed (Creep Score)
-            team_data[keys[0]] += participants[id]['minionsKilled']
-
-            # Add Jungle minions killed
-            team_data[keys[0]] += participants[id]['jungleMinionsKilled']
+            team_data[team+blank_keys[1]] += participants[id]['minionsKilled']
 
             # Add experience (xp)
-            team_data[keys[0]] += participants[id]['xp']
+            team_data[team+blank_keys[2]] += participants[id]['xp']
 
-            # Add kills
-            team_data[keys[0]] += participants[id]['jungleMinionsKilled']
+            # Add jungle minions killed
+            team_data[team+blank_keys[3]
+                      ] += participants[id]['jungleMinionsKilled']
+        return team_data
 
-    def process_events(self, frames: list) -> dict:
+    def process_events(self, frames: list, player_team_map: dict) -> dict:
         """
         Processes the event data for each team and returns it.
         """
@@ -83,54 +85,148 @@ class RawDataFormatter():
         # Inhibitor kill type = 'BUILDING_KILL'
         # Building Type = 'INHIBITOR_BUILDING'
 
-        blue_events = ['blue_wards_placed', 'blue_wards_destroyed',
-                       'blue_air_dragons', 'blue_fire_dragons', 'blue_earth_dragons',
-                       'blue_ocean_dragons', 'blue_turret_plates', 'blue_turrets_destroyed',
-                       'blue_rift_heralds', 'blue_barons', 'blue_inhibitors',
-                       'blue_kills', 'blue_assists', 'blue_deaths']
+        blank_events = ['_wards_placed', '_wards_destroyed',
+                        '_air_dragons', '_fire_dragons', '_earth_dragons',
+                        '_ocean_dragons', '_turrets_destroyed',
+                        '_rift_heralds', '_barons', '_inhibitors_destroyed',
+                        '_kills', '_assists', '_deaths']
 
-        red_events = [x.replace('blue', 'red') for x in blue_events]
+        blue_events = ['blue'+x for x in blank_events]
 
+        red_events = ['red'+x for x in blank_events]
+
+        # Intiailize events dictionary
         all_keys = blue_events + red_events
-
         team_events = {k: 0 for k in all_keys}
 
-        for frame in frames:
+        fifteen_min_to_ms = 900000
+
+        for i, frame in enumerate(frames):
+
+            if i > 16:
+                break
 
             # Loop through frame data
-            for data in frame:
+            for data in frame['events']:
 
-                # Check for killing anything
-                if 'killerId' not in data:
+                # Ensure timestamp is within bounds
+                # If not, all next frames are out of bounds as well
+                if data['timestamp'] > fifteen_min_to_ms:
+                    break
+
+                # Check for killing anything & killerId is legitament
+                if 'killerId' not in data and data['type'] != 'WARD_PLACED':
                     continue
 
-                kill_type = data['type']
+                # Check killerId is legitament
+                if 'killerId' in data:
+                    if data['killerId'] < 1 or data['killerId'] > 10:
+                        continue
 
-                # Add for Kills, Deaths, and Assists
-                if kill_type == 'CHAMPION_KILL':
+                # Check creatorId is legitament
+                if data['type'] == 'WARD_PLACED':
+                    if data['creatorId'] <= 0:
+                        continue
 
-                    # Add Kills to killer team
-                    team_events['']
+                action_type = data['type']
 
-    def determine_team(self, position):
+                # Kills, Deaths, and Assists
+                if action_type == 'CHAMPION_KILL':
+
+                    # Add Kill to Killer's team
+                    killer_team = player_team_map[str(data['killerId'])]
+                    team_events[killer_team+'_kills'] += 1
+
+                    # Add Assists to Killer's team
+                    if 'assistingParticipantIds' in data:
+                        team_events[killer_team +
+                                    '_assists'] += len(data['assistingParticipantIds'])
+
+                    # Add death to other team
+                    victim_team = player_team_map[str(data['victimId'])]
+                    team_events[victim_team+'_deaths'] += 1
+
+                # Wards
+                if action_type == 'WARD_KILL':
+
+                    # Add ward destroyed to team
+                    killer_team = player_team_map[str(data['killerId'])]
+                    team_events[victim_team+'_wards_destroyed'] += 1
+
+                if action_type == 'WARD_PLACED':
+
+                    # Add ward placed to team
+                    creator_team = player_team_map[str(data['creatorId'])]
+                    team_events[creator_team+'_wards_placed'] += 1
+
+                # Epic Monsters
+                if action_type == 'ELITE_MONSTER_KILL':
+
+                    killer_team = player_team_map[str(data['killerId'])]
+
+                    # Rift Herald
+                    if data['monsterType'] == 'RIFTHERALD':
+                        team_events[killer_team+'_rift_heralds'] += 1
+
+                    # Baron
+                    if data['monsterType'] == 'BARON_NASHOR':
+                        team_events[killer_team+'_barons'] += 1
+
+                    # Dragons
+                    if data['monsterType'] == 'DRAGON':
+
+                        # Fire Dragons
+                        if data['monsterSubType'] == 'FIRE_DRAGON':
+                            team_events[killer_team+'_fire_dragons'] += 1
+
+                        # Ocean Dragons
+                        if data['monsterSubType'] == 'OCEAN_DRAGON':
+                            team_events[killer_team+'_ocean_dragons'] += 1
+
+                        # Air Dragons
+                        if data['monsterSubType'] == 'AIR_DRAGON':
+                            team_events[killer_team+'_air_dragons'] += 1
+
+                        # Earth Dragons
+                        if data['monsterSubType'] == 'EARTH_DRAGON':
+                            team_events[killer_team+'_earth_dragons'] += 1
+                # Buildings
+                if action_type == 'BUILDING_KILL':
+                    killer_team = player_team_map[str(data['killerId'])]
+
+                    # Turrets
+                    if data['buildingType'] == 'TOWER_BUILDING':
+                        team_events[killer_team+'_turrets_destroyed'] += 1
+
+                    # Inhibitors
+                    if data['buildingType'] == 'INHIBITOR_BUILDING':
+                        team_events[killer_team+'_inhibitors_destroyed'] += 1
+        return team_events
+
+    def determine_teams(self, players):
         """
         A method that returns the team ID of a player given their position
         at the start of the game.
         Parameter(s): 
             position (x, y): Position of player
         """
-        BLUE_TEAM_ID = 100
-        RED_TEAM_ID = 200
+
+        player_team_map = {}
         # Team 100 starts within 1000 units of the origin in both axis
-        team_100_starting_threshold = 1000
-        if position[0] < team_100_starting_threshold and position[1] < team_100_starting_threshold:
-            return 100
-        return 200
+        blue_team_starting_threshhold = 1000
+        for p_id in players:
+            position = players[p_id]['position']
+            if position['x'] < blue_team_starting_threshhold and position['y'] < blue_team_starting_threshhold:
+                player_team_map[p_id] = 'blue'
+            else:
+                player_team_map[p_id] = 'red'
+        return player_team_map
+
+# raw_data_wrangler = RawDataWrangler.RawDataWrangler('na1', 'Sasheemy')
+# raw_timelines = raw_data_wrangler.get_raw_match_timelines()
+# raw_data_formatter = RawDataFormatter('Sasheemy')
+# raw_data_formatter.format_data(raw_timelines)
 
 
-raw_data_wrangler = RawDataWrangler.RawDataWrangler('na1', 'Sasheemy')
-raw_data = raw_data_wrangler.get_raw_match_data()
-
-raw_data[-1]['info']['participants'][0].keys()
-
-raw_data[-1]['metadata']
+if __name__ == '__main__':
+    __name__ = 'src.RawDataFormatter'
