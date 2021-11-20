@@ -12,25 +12,76 @@ class RawDataFormatter():
         self._data = {}
         self._summoner_name = summoner_name
 
-    def format_data(self, raw_timelines: list) -> pandas.DataFrame:
+    def format_data(self, raw_timelines: list) -> pd.DataFrame:
+
+        if raw_timelines is None:
+            return
+
+        timelines_formatted = {}
+
+        i = 0
         for timeline in raw_timelines:
+            i += 1
+            # Don't use games less than 15 minutes long
+            # Length will be 16 because the i = 15 frame holds
+            # The data from min 14-15
+            if len(timeline['info']['frames']) < 16:
+                continue
 
             # Determine each player's team first
             player_teams = self.determine_teams(
                 timeline['info']['frames'][0]['participantFrames'])
 
             # Participants only need to be processed once at the 15 minute mark
+
             player_data = self.process_participants(
-                timeline['info']['frames'][16]['participantFrames'], player_teams)
-            print(player_data)
+                timeline['info']['frames'][15]['participantFrames'], player_teams)
+            # print(player_data)
 
             # send the frames for event data to be processed
             event_data = self.process_events(
                 timeline['info']['frames'], player_teams)
-            print(event_data)
+            # print(event_data)
 
             # Combines the above data into a dictionary of lists
+            game_dict = {**player_data, **event_data}
 
+            # Get winning team
+            last_frame_i = len(timeline['info']['frames']) - 1
+            win_event_index = len(
+                timeline['info']['frames'][last_frame_i]['events']) - 1
+            winner_raw = timeline['info']['frames'][last_frame_i]['events'][win_event_index]['winningTeam']
+            BLUE_TEAM_ID = 100
+            RED_TEAM_ID = 200
+
+            if winner_raw == BLUE_TEAM_ID:
+                winner = 'blue'
+            elif winner_raw == RED_TEAM_ID:
+                winner = 'red'
+            else:
+                continue
+
+            # Add timeline's date.
+            try:
+                last_event_i = len(
+                    timeline['info']['frames'][last_frame_i]['events']) - 1
+                unix_date = timeline['info']['frames'][last_frame_i]['events'][last_event_i]['realTimestamp']
+
+            except KeyError:
+                unix_date = None
+                print(f"Error at {i}")
+
+            # Add date and winner to game_dict
+            game_dict['unix_date'] = unix_date
+            game_dict['winner'] = winner
+
+            # Add game_dict to complete_dict
+            for k, v in game_dict.items():
+                if k not in timelines_formatted:
+                    timelines_formatted[k] = [v]
+                else:
+                    timelines_formatted[k].append(v)
+        return pd.DataFrame.from_dict(timelines_formatted)
 
     def process_participants(self, participants: list, player_team_map: dict) -> dict:
         """
@@ -88,7 +139,7 @@ class RawDataFormatter():
         blank_events = ['_wards_placed', '_wards_destroyed',
                         '_air_dragons', '_fire_dragons', '_earth_dragons',
                         '_ocean_dragons', '_turrets_destroyed',
-                        '_rift_heralds', '_barons', '_inhibitors_destroyed',
+                        '_rift_heralds', '_inhibitors_destroyed',
                         '_kills', '_assists', '_deaths']
 
         blue_events = ['blue'+x for x in blank_events]
@@ -151,7 +202,7 @@ class RawDataFormatter():
 
                     # Add ward destroyed to team
                     killer_team = player_team_map[str(data['killerId'])]
-                    team_events[victim_team+'_wards_destroyed'] += 1
+                    team_events[killer_team+'_wards_destroyed'] += 1
 
                 if action_type == 'WARD_PLACED':
 
@@ -167,10 +218,6 @@ class RawDataFormatter():
                     # Rift Herald
                     if data['monsterType'] == 'RIFTHERALD':
                         team_events[killer_team+'_rift_heralds'] += 1
-
-                    # Baron
-                    if data['monsterType'] == 'BARON_NASHOR':
-                        team_events[killer_team+'_barons'] += 1
 
                     # Dragons
                     if data['monsterType'] == 'DRAGON':
@@ -207,7 +254,7 @@ class RawDataFormatter():
         """
         A method that returns the team ID of a player given their position
         at the start of the game.
-        Parameter(s): 
+        Parameter(s):
             position (x, y): Position of player
         """
 
@@ -222,11 +269,8 @@ class RawDataFormatter():
                 player_team_map[p_id] = 'red'
         return player_team_map
 
+
 # raw_data_wrangler = RawDataWrangler.RawDataWrangler('na1', 'Sasheemy')
-# raw_timelines = raw_data_wrangler.get_raw_match_timelines()
+# raw_timelines = raw_data_wrangler.get_raw_match_timelines(count=1)
 # raw_data_formatter = RawDataFormatter('Sasheemy')
-# raw_data_formatter.format_data(raw_timelines)
-
-
-if __name__ == '__main__':
-    __name__ = 'src.RawDataFormatter'
+# raw_data = raw_data_formatter.format_data(raw_timelines)

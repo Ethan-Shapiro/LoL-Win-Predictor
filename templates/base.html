@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <!-- Required Meta Tags -->
+    <meta charset="utf-8">
+
+    <link rel="stylesheet" href="static/style.css">
+    <title>Forfeit now?</title>
+</head>
+
+<body class="content">
+
+    <div class="logo" style="padding-bottom:20px;">
+        <img src={{ url_for('static', filename='temp_logo.png' ) }} alt="Logo" class="center">
+    </div>
+    <div class="searchbox">
+        <div name="searchicon">
+        </div>
+        <div>
+            <input maxlength="100" class="center" style="width: 400px; height: 50px; background: #3F3D3C;">
+        </div>
+        <select name="region" id="region">
+            <option value="na1">NA</option>
+            <option value="euw">EUW</option>
+            <option value="br1">BR</option>
+            <option value="kr">KR</option>
+        </select>
+        <button type="button">Go!</button>
+        {% block content %}{% endblock %}
+    </div>
+</body>
+
+<footer>
+
+</footer>
+
+</html>
