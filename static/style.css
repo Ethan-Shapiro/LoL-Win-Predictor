@@ -26,11 +26,23 @@ img {
     margin-bottom: auto;
 }
 
-.predcontainer {
-    height: 800px; 
-    width: 550px; 
-    margin-left: auto; 
-    margin-right: auto;
+.team {
+    height: 100%;
+    width: auto;
+    background: green;
+}
+
+.predictioncontainer {
+    height: 1/3%; 
+    width: 100%;
+    background: #3F3D3C;
+    display: grid;
+    grid-template-columns: auto auto;
+}
+
+.predictionscontainer {
+    height: 900px; 
+    width: 700px; 
     background: #3F3D3C;
     display: grid;
     grid-template-columns: auto;
