@@ -2,12 +2,6 @@ body {
     font-family: Helvetica, sans-serif;
 }
 
-img {
-    width: 150px;
-    height: inherit;
-    opacity: 0.8;
-}
-
 .searchbox {
     height: 60px; 
     width: 550px; 
@@ -24,26 +18,4 @@ img {
     margin-right: auto;
     margin-top: auto; 
     margin-bottom: auto;
-}
-
-.team {
-    height: 100%;
-    width: auto;
-    background: green;
-}
-
-.predictioncontainer {
-    height: 1/3%; 
-    width: 100%;
-    background: #3F3D3C;
-    display: grid;
-    grid-template-columns: auto auto;
-}
-
-.predictionscontainer {
-    height: 900px; 
-    width: 700px; 
-    background: #3F3D3C;
-    display: grid;
-    grid-template-columns: auto;
 }

@@ -1,20 +1,30 @@
 {% extends 'base.html' %}
-
+{% block head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='predictionstyle.css') }}">
+{% endblock %}
 {% block content %}
-<div class="predictionscontainer">
-    <div name="prediction1" class="predictioncontainer">
-        <div name="allyteam" class="team">
-
+<div class="team">
+    <div class="summoners">
+        <div class="summoner">
+            <img src="{{ url_for('static', filename='temp_logo.png' ) }}">
+            <p>Summoner_Name</p>
         </div>
-        <div name="enemyteam" class="team">
-
+        <div class="summoner">
+            <img src="{{ url_for('static', filename='temp_logo.png' ) }}">
+            <p>Summoner_Name</p>
         </div>
-    </div>
-    <div name="prediction2">
-
-    </div>
-    <div name="prediction3">
-
+        <div class="summoner">
+            <img src="{{ url_for('static', filename='temp_logo.png' ) }}">
+            <p>Summoner_Name</p>
+        </div>
+        <div class="summoner">
+            <img src="{{ url_for('static', filename='temp_logo.png' ) }}">
+            <p>Summoner_Name</p>
+        </div>
+        <div class="summoner">
+            <img src="{{ url_for('static', filename='temp_logo.png' ) }}">
+            <p>Summoner_Name</p>
+        </div>
     </div>
 </div>
 {% endblock %}

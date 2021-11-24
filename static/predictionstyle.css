@@ -1,0 +1,36 @@
+.summoner {
+    display: grid;
+    grid-template-columns: 50px 150px;
+    text-align: center;
+    width: 200px;
+}
+
+.summoner > img {
+    max-height: 40px;
+    max-width: 40px;
+    margin: auto;
+}
+
+.summoner > p {
+    display: inline;
+    float: left;
+    text-align: left;
+}
+
+.statContainer > p {
+    display: inline-block
+}
+
+.team {
+    display: grid;
+    max-width: fit-content;
+    max-height: 250px;
+    width: 450px;
+    grid-template-columns: 200px 120px 75px;
+}
+
+.match {
+    display: grid;
+    grid-template-columns: 50% 50%;
+    max-width: 900px;
+}
