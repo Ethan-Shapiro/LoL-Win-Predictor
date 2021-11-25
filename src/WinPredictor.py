@@ -44,4 +44,4 @@ class WinPredictor():
 
         # Load the most recent file.
 
-        return
+        return 
