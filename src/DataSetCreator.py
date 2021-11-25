@@ -18,7 +18,7 @@ def create_dataset_from_raw(count, summoner_name, region):
 
 
 def save_df_to_pickle(df, summoner_name, rank):
-    df.to_pickle(path=f'{data_loc}/{summoner_name}_{rank}.pkl')
+    df.to_pickle(path=f'{data_loc}/{rank}_{summoner_name}.pkl')
     print(f"Successfully saved {summoner_name} to pickle.")
 
 
@@ -29,19 +29,26 @@ def read_df_from_pickle(summoner_name):
 
 summoner_names = ['Sasheemy', 'gnomes4', 'WinnahWyatt', 'Duckz']
 
+# TODO Add Iron Players
+iron_players = []
+bronze_players = ['Ativva', '0SaN', 'TheOnlySRT', 'ChrisLeodon']
+silver_players = ['jamesbong3', 'Adamik',
+                  'Kei1245', 'Dark Cosmic 4', 'Torqids']
+gold_players = ['ddnycee', 'Sadeki', 'NenoPanda', 'Huntottosaw', 'Qcpatron']
 plat_players = ['Band 2wice', 'MuackaPuack', 'Sabie',
                 'RebornSkullyman', 'ManGoated', 'Mugzzy', 'BeboBash', 'BigMan']
-diamond_players = ['']
+diamond_players = ['PayXtoXwin', 'gay rat',
+                   'vincoin', 'Yassuo', 'congqiancongqian']
 challenger_players = ['TL Armao', 'Doublelift', 'Pobelter', 'Revenge', 'Eyla']
 pro_players = ['Biofrost', 'Peng Yiliang', 'FA Bjergsen', 'liveevil',
                'SentientAI', 'blaberfish2', 'goldenglue', 'Supersonics1']
 
 region = 'na1'
 
-for s in plat_players[3:]:
+for s in diamond_players:
     df = create_dataset_from_raw(1000, s, region)
     print(df.shape)
-    save_df_to_pickle(df, s, 'plat')
+    save_df_to_pickle(df, s, 'dia')
 
 # df = create_dataset_from_raw(1000, 'Sasheemy', 'na1')
 # print(df.shape)

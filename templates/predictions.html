@@ -3,28 +3,149 @@
 <link rel="stylesheet" href="{{ url_for('static', filename='predictionstyle.css') }}">
 {% endblock %}
 {% block content %}
-<div class="team">
-    <div class="summoners">
-        <div class="summoner">
-            <img src="{{ url_for('static', filename='temp_logo.png' ) }}">
-            <p>Summoner_Name</p>
+<div class="predictions">
+    {% for pred in preds %}
+    <div class="prediction">
+        <p name="percentage">{{ pred.percentage }}%</p>
+    </div>
+    <div class="match" style="background-color: {{ pred.color }}">
+        <div class="team">
+            <div class="summoners">
+                <div class="summoner">
+                    <img src="{{ url_for('static', filename='temp_logo.png' ) }}">
+                    <p>{{ pred.Ally.Names.0 }}</p>
+                </div>
+                <div class="summoner">
+                    <img src="{{ url_for('static', filename='temp_logo.png' ) }}">
+                    <p>{{ pred.Ally.Names.1 }}</p>
+                </div>
+                <div class="summoner">
+                    <img src="{{ url_for('static', filename='temp_logo.png' ) }}">
+                    <p>{{ pred.Ally.Names.2 }}</p>
+                </div>
+                <div class="summoner">
+                    <img src="{{ url_for('static', filename='temp_logo.png' ) }}">
+                    <p>{{ pred.Ally.Names.3 }}</p>
+                </div>
+                <div class="summoner">
+                    <img src="{{ url_for('static', filename='temp_logo.png' ) }}">
+                    <p>{{ pred.Ally.Names.4 }}</p>
+                </div>
+            </div>
+            <div class="stats">
+                <div class="statContainer">
+                    <label>CS: </label>
+                    <p name="csCounter">{{ pred.Ally.CS }}</p>
+                </div>
+                <div class="statContainer">
+                    <label>Gold: </label>
+                    <p name="goldCounter">{{ pred.Ally.Gold }}</p>
+                </div>
+                <div class="statContainer">
+                    <label>EXP: </label>
+                    <p name="expCounter">{{ pred.Ally.EXP }}</p>
+                </div>
+                <div class="statContainer">
+                    <label>Towers: </label>
+                    <p name="towerCounter">{{ pred.Ally.Towers }}</p>
+                </div>
+                <div class="statContainer">
+                    <label>Inhibs: </label>
+                    <p name="inhibCounter">{{ pred.Ally.Inhibs }}</p>
+                </div>
+            </div>
+            <div class="objectives">
+                <div class="statContainer">
+                    <label>Fire: </label>
+                    <p name="fireDragonCounter">{{ pred.Ally.FireDragons }}</p>
+                </div>
+                <div class="statContainer">
+                    <label>Water: </label>
+                    <p name="waterDragonCounter">{{ pred.Ally.WaterDragons }}</p>
+                </div>
+                <div class="statContainer">
+                    <label>Earth: </label>
+                    <p name="earthDragonCounter">{{ pred.Ally.EarthDragons }}</p>
+                </div>
+                <div class="statContainer">
+                    <label>Air: </label>
+                    <p name="airDragonCounter">{{ pred.Ally.AirDragons }}</p>
+                </div>
+                <div class="statContainer">
+                    <label>Heralds: </label>
+                    <p name="heraldCounter">{{ pred.Ally.Heralds }}</p>
+                </div>
+            </div>
         </div>
-        <div class="summoner">
-            <img src="{{ url_for('static', filename='temp_logo.png' ) }}">
-            <p>Summoner_Name</p>
-        </div>
-        <div class="summoner">
-            <img src="{{ url_for('static', filename='temp_logo.png' ) }}">
-            <p>Summoner_Name</p>
-        </div>
-        <div class="summoner">
-            <img src="{{ url_for('static', filename='temp_logo.png' ) }}">
-            <p>Summoner_Name</p>
-        </div>
-        <div class="summoner">
-            <img src="{{ url_for('static', filename='temp_logo.png' ) }}">
-            <p>Summoner_Name</p>
+        <div class="team">
+            <div class="summoners">
+                <div class="summoner">
+                    <img src="{{ url_for('static', filename='temp_logo.png' ) }}">
+                    <p>{{ pred.Enemy.Names.0 }}</p>
+                </div>
+                <div class="summoner">
+                    <img src="{{ url_for('static', filename='temp_logo.png' ) }}">
+                    <p>{{ pred.Enemy.Names.1 }}</p>
+                </div>
+                <div class="summoner">
+                    <img src="{{ url_for('static', filename='temp_logo.png' ) }}">
+                    <p>{{ pred.Enemy.Names.2 }}</p>
+                </div>
+                <div class="summoner">
+                    <img src="{{ url_for('static', filename='temp_logo.png' ) }}">
+                    <p>{{ pred.Enemy.Names.3 }}</p>
+                </div>
+                <div class="summoner">
+                    <img src="{{ url_for('static', filename='temp_logo.png' ) }}">
+                    <p>{{ pred.Enemy.Names.4 }}</p>
+                </div>
+            </div>
+            <div class="stats">
+                <div class="statContainer">
+                    <label>CS: </label>
+                    <p name="csCounter">{{ pred.Enemy.CS }}</p>
+                </div>
+                <div class="statContainer">
+                    <label>Gold: </label>
+                    <p name="goldCounter">{{ pred.Enemy.Gold }}</p>
+                </div>
+                <div class="statContainer">
+                    <label>EXP: </label>
+                    <p name="expCounter">{{ pred.Enemy.EXP }}</p>
+                </div>
+                <div class="statContainer">
+                    <label>Towers: </label>
+                    <p name="towerCounter">{{ pred.Enemy.Towers }}</p>
+                </div>
+                <div class="statContainer">
+                    <label>Inhibs: </label>
+                    <p name="inhibCounter">{{ pred.Enemy.Inhibs }}</p>
+                </div>
+            </div>
+            <div class="objectives">
+                <div class="statContainer">
+                    <label>Fire: </label>
+                    <p name="fireDragonCounter">{{ pred.Enemy.FireDragons }}</p>
+                </div>
+                <div class="statContainer">
+                    <label>Water: </label>
+                    <p name="waterDragonCounter">{{ pred.Enemy.WaterDragons }}</p>
+                </div>
+                <div class="statContainer">
+                    <label>Earth: </label>
+                    <p name="earthDragonCounter">{{ pred.Enemy.EarthDragons }}</p>
+                </div>
+                <div class="statContainer">
+                    <label>Air: </label>
+                    <p name="airDragonCounter">{{ pred.Enemy.AirDragons }}</p>
+                </div>
+                <div class="statContainer">
+                    <label>Heralds: </label>
+                    <p name="heraldCounter">{{ pred.Enemy.Heralds }}</p>
+                </div>
+            </div>
         </div>
     </div>
+    {% endfor %}
 </div>
 {% endblock %}

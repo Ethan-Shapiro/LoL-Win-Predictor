@@ -31,6 +31,19 @@
 
 .match {
     display: grid;
-    grid-template-columns: 50% 50%;
+    grid-template-columns: repeat(2, 450px);
     max-width: 900px;
+}
+
+.prediction {
+    text-align: center;
+    margin: auto;
+}
+
+.predictions {
+    display: grid;
+    margin-top: 20px;
+    grid-template-columns: 100px 900px;
+    row-gap: 20px;
+    justify-content: center;
 }
