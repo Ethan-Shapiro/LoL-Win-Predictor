@@ -1,5 +1,4 @@
 import pandas as pd
-import RawDataWrangler
 
 
 class RawDataFormatter():
@@ -71,9 +70,13 @@ class RawDataFormatter():
                 unix_date = None
                 print(f"Error at {i}")
 
-            # Add date and winner to game_dict
+            # Add match_id
+            match_id = timeline['metadata']['matchId']
+
+            # Add date, winner, and match id to game_dict
             game_dict['unix_date'] = unix_date
             game_dict['winner'] = winner
+            game_dict['match_id'] = match_id
 
             # Add game_dict to complete_dict
             for k, v in game_dict.items():
@@ -138,7 +141,7 @@ class RawDataFormatter():
 
         blank_events = ['_wards_placed', '_wards_destroyed',
                         '_air_dragons', '_fire_dragons', '_earth_dragons',
-                        '_ocean_dragons', '_turrets_destroyed',
+                        '_water_dragons', '_turrets_destroyed',
                         '_rift_heralds', '_inhibitors_destroyed',
                         '_kills', '_assists', '_deaths']
 
@@ -199,16 +202,28 @@ class RawDataFormatter():
 
                 # Wards
                 if action_type == 'WARD_KILL':
+                    valid_ward_types = ['SIGHT_WARD',
+                                        'YELLOW_TRINKET', 'CONTROL_WARD']
+                    if data['wardType'].upper() not in valid_ward_types:
+                        continue
 
                     # Add ward destroyed to team
                     killer_team = player_team_map[str(data['killerId'])]
                     team_events[killer_team+'_wards_destroyed'] += 1
+                    # print(
+                    #     f"{killer_team}: killed {data['wardType']} at {data['timestamp']}")
 
                 if action_type == 'WARD_PLACED':
+                    valid_ward_types = ['SIGHT_WARD',
+                                        'YELLOW_TRINKET', 'CONTROL_WARD']
+                    if data['wardType'].upper() not in valid_ward_types:
+                        continue
 
                     # Add ward placed to team
                     creator_team = player_team_map[str(data['creatorId'])]
                     team_events[creator_team+'_wards_placed'] += 1
+                    # print(
+                    #     f"{creator_team}: made {data['wardType']} at {data['timestamp']}")
 
                 # Epic Monsters
                 if action_type == 'ELITE_MONSTER_KILL':
@@ -227,8 +242,8 @@ class RawDataFormatter():
                             team_events[killer_team+'_fire_dragons'] += 1
 
                         # Ocean Dragons
-                        if data['monsterSubType'] == 'OCEAN_DRAGON':
-                            team_events[killer_team+'_ocean_dragons'] += 1
+                        if data['monsterSubType'] == 'WATER_DRAGON':
+                            team_events[killer_team+'_water_dragons'] += 1
 
                         # Air Dragons
                         if data['monsterSubType'] == 'AIR_DRAGON':
@@ -271,6 +286,6 @@ class RawDataFormatter():
 
 
 # raw_data_wrangler = RawDataWrangler.RawDataWrangler('na1', 'Sasheemy')
-# raw_timelines = raw_data_wrangler.get_raw_match_timelines(count=1)
+# raw_timelines = raw_data_wrangler.get_raw_match_timelines()
 # raw_data_formatter = RawDataFormatter('Sasheemy')
 # raw_data = raw_data_formatter.format_data(raw_timelines)
