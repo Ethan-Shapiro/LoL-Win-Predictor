@@ -9,7 +9,7 @@ class DataValidator():
 
     def validate_data(self, formatted_data: pd.DataFrame) -> pd.DataFrame:
         """
-        A function that ensures each column of the formatted data contaings no nulls, 
+        A function that ensures each column of the formatted timeline data contains no nulls, 
         are the correct types, and useable to pass to machine learning algorithms.
         """
         for col in formatted_data.columns:
@@ -20,15 +20,15 @@ class DataValidator():
                 self.handle_nulls(col)
 
             # Check if column is valid (type and range)
-            self.validate_type(col)
+            self.validate_feature_type(col)
 
         return formatted_data
 
-    def validate_type(self, col: pd.Series) -> pd.Series:
+    def validate_feature_type(self, col: pd.Series) -> pd.Series:
         """
-        A function that validates the data in this column is a predetermined correct type.
+        A function that validates the data in this feature column is a predetermined correct type.
         """
-        # All data should be integers greater than or equal 0
+        # All features should be integers greater than or equal 0
         for i, d in enumerate(col):
             try:
                 col[i] = int(d)
@@ -39,6 +39,20 @@ class DataValidator():
                 col[i] = np.NaN
 
         return col.astype('int64')
+
+    def validate_target_type(self, target: pd.Series) -> pd.Series:
+        """
+        A function that validates the data in the target column is a predetermined correct type.
+        """
+        valid_values = ['blue', 'red']
+
+        bool_filter = []
+        for val in target:
+            if val in valid_values:
+                bool_filter.append(True)
+            else:
+                bool_filter.append(False)
+        return bool_filter
 
     def handle_nulls(self, col: pd.Series):
         """
@@ -54,6 +68,6 @@ class DataValidator():
 # raw_data_wrangler = RawDataWrangler.RawDataWrangler('na1', 'Sasheemy')
 # raw_timelines = raw_data_wrangler.get_raw_match_timelines()
 # raw_data_formatter = RawDataFormatter.RawDataFormatter('Sasheemy')
-# formatted_data = raw_data_formatter.format_data(raw_timelines)
+# formatted_data = raw_data_formatter.format_timeline_data(raw_timelines)
 # data_validator = DataValidator()
 # validated_data = data_validator.validate_data(formatted_data=formatted_data)

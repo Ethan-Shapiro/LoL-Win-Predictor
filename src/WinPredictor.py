@@ -11,7 +11,7 @@ from os import listdir, getcwd
 
 class WinPredictor():
 
-    MODELS_PATH = getcwd().replace('\\', '/')+'/models'
+    MODELS_PATH = getcwd().replace('\\', '/')+'/static/models/'
 
     def load_saved_model(self):
         """
@@ -29,19 +29,32 @@ class WinPredictor():
             if item.split('.')[1] == 'pkl':
                 filenames.append(item)
 
-        # Find most recent model if there are any
-        most_recent_i = -1
-        most_recent_date = None
-        for i, filename in enumerate(filenames):
-            date_raw = filename.split("_")[0]
-            date = datetime.fromisoformat(date_raw)
-            if most_recent_date == None:
-                most_recent_date = date
-                most_recent_i = i
-            elif most_recent_date < date:
-                most_recent_date = date
-                most_recent_i = i
+        # Find the most recent model
+        file_names = listdir(self.MODELS_PATH)
+        most_recent = file_names[-1]
 
-        # Load the most recent file.
+        print(most_recent)
 
-        return 
+        with open(self.MODELS_PATH+most_recent, 'rb') as f:
+            model = pickle.load(f)
+        print(model)
+        self.model = model
+
+    def predict(self, timelines):
+        # Split into X and Y and remove unnecessary columns
+        X = timelines.drop(
+            ['red_kills', 'red_deaths', 'winner', 'match_id'], axis=1)
+        y = timelines['winner']
+
+        predictions = self.model.predict(X)
+        all_probs = self.model.predict_proba(X)
+
+        # Max index of max probability
+        ix = all_probs.argmax(1)
+
+        max_probs = []
+        for row, i in enumerate(ix):
+            max_probs.append(all_probs[row][i])
+
+        # return as (prediction, probability, actual)
+        return {'pred': predictions, 'prob': max_probs, 'actual': y}

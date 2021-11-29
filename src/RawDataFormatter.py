@@ -11,7 +11,7 @@ class RawDataFormatter():
         self._data = {}
         self._summoner_name = summoner_name
 
-    def format_data(self, raw_timelines: list) -> pd.DataFrame:
+    def format_timeline_data(self, raw_timelines: list) -> pd.DataFrame:
 
         if raw_timelines is None:
             return
@@ -284,8 +284,46 @@ class RawDataFormatter():
                 player_team_map[p_id] = 'red'
         return player_team_map
 
+    def format_match_data(self, raw_matches: list) -> pd.DataFrame:
+        """
+        A method that returns the summoner name, champion, team, matchId.
+        """
 
-# raw_data_wrangler = RawDataWrangler.RawDataWrangler('na1', 'Sasheemy')
-# raw_timelines = raw_data_wrangler.get_raw_match_timelines()
+        def team_from_id(id):
+            if id == 100:
+                return "blue"
+            return "red"
+
+        match_ids = []
+        summoner_names = []
+        champions = []
+        teams = []
+        for match in raw_matches:
+            # Get matchId
+            match_id = match['metadata']['matchId']
+
+            # Get participants to go through
+            participants = match['info']['participants']
+            for participant in participants:
+                # Append match id for player
+                match_ids.append(match_id)
+
+                # Get champion name
+                champions.append(participant['championName'])
+
+                # Get summoner name
+                summoner_names.append(participant['summonerName'])
+
+                # Get Team ID
+                team = team_from_id(participant['teamId'])
+                teams.append(team)
+
+        matches_formatted = {'summoner_name': summoner_names, 'champion_name': champions,
+                             'team': teams, 'match_id': match_ids}
+        return pd.DataFrame.from_dict(matches_formatted)
+
+
+# raw_data_wrangler = RawDataWrangler.RawDataWrangler('blankapi')
+# raw_matches = raw_data_wrangler.get_three_recent_matches('Sasheemy', 'na1')
 # raw_data_formatter = RawDataFormatter('Sasheemy')
-# raw_data = raw_data_formatter.format_data(raw_timelines)
+# formatted_matches = raw_data_formatter.format_match_data(raw_matches)

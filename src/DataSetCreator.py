@@ -13,9 +13,10 @@ def create_dataset_from_raw(count, summoner_name, region):
     """
     rdw = RawDataWrangler('blank')
     rdf = RawDataFormatter(summoner_name)
+    rdw.player = rdw.validate_summoner_name(summoner_name, region)
     raw_data = rdw.get_raw_match_timelines(
         summoner_name, region, count=count, start=0)
-    formatted_df = rdf.format_data(raw_data)
+    formatted_df = rdf.format_timeline_data(raw_data)
     return formatted_df
 
 
@@ -61,14 +62,14 @@ all_players = diamond_players + plat_players + \
 #         time.sleep(60)
 
 
-for s in plat_players:
-    df = create_dataset_from_raw(1000, s, region)
-    print(df.shape)
-    save_df_to_csv(df, s, 'plat')
+# for s in bronze_players:
+#     df = create_dataset_from_raw(1000, s, region)
+#     print(df.shape)
+#     save_df_to_csv(df, s, 'bronze')
 
-# df = create_dataset_from_raw(1000, 'Sasheemy', 'na1')
-# print(df.shape)
-# save_df_to_csv(df, 'Sasheemy', 'fixed')
+df = create_dataset_from_raw(3, 'oWill', 'na1')
+print(df.shape)
+save_df_to_csv(df, 'oWill', 'UNSEENDATA')
 
 # test_df = pd.DataFrame.from_dict({"test": [1, 2, 3], "test2": [1, 2, 3]})
 # save_df_to_pickle(test_df, 'asdfasd')
