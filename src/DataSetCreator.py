@@ -1,7 +1,5 @@
-import time
 from RawDataWrangler import RawDataWrangler
 from RawDataFormatter import RawDataFormatter
-from DataValidator import DataValidator
 import pandas as pd
 
 data_loc = 'data'
@@ -67,9 +65,9 @@ all_players = diamond_players + plat_players + \
 #     print(df.shape)
 #     save_df_to_csv(df, s, 'bronze')
 
-df = create_dataset_from_raw(3, 'oWill', 'na1')
-print(df.shape)
-save_df_to_csv(df, 'oWill', 'UNSEENDATA')
+# df = create_dataset_from_raw(3, 'oWill', 'na1')
+# print(df.shape)
+# save_df_to_csv(df, 'oWill', 'UNSEENDATA')
 
 # test_df = pd.DataFrame.from_dict({"test": [1, 2, 3], "test2": [1, 2, 3]})
 # save_df_to_pickle(test_df, 'asdfasd')

@@ -1,4 +1,4 @@
-from pathlib import Path
+import os
 from flask import Flask, render_template, request, redirect
 from flask.helpers import url_for
 from src.RawDataWrangler import RawDataWrangler
@@ -6,10 +6,11 @@ from src.RawDataFormatter import RawDataFormatter
 from src.DataValidator import DataValidator
 from src.WinPredictor import WinPredictor
 import copy
-import config
+
+api_key = os.environ.get('RIOT_API_KEY')
 
 app = Flask(__name__)
-raw_data_wrangler = RawDataWrangler(API_KEY=config.API_KEY)
+raw_data_wrangler = RawDataWrangler(API_KEY=api_key)
 raw_data_formatter = RawDataFormatter(summoner_name="Sasheemy")
 data_validator = DataValidator()
 win_predictor = WinPredictor()

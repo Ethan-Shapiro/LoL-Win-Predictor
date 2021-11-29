@@ -7,7 +7,7 @@
     {% for pred in preds %}
     <div class="prediction" style="background-color: {{ pred.color }}">
         <label name="modelPrediction">Predicted: {{ pred.modelPrediction }}</label>
-        <p name="percentage">{{ pred.percentage }}%</p>
+        <p name="percentage">Player Win:{{ pred.percentage }}%</p>
         <label name="actual">Actual: {{ pred.actual }}</label>
     </div>
     <div class="match">
