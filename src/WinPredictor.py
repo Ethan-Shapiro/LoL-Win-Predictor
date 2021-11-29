@@ -33,11 +33,11 @@ class WinPredictor():
         file_names = listdir(self.MODELS_PATH)
         most_recent = file_names[-1]
 
-        print(most_recent)
+        # print(most_recent)
 
         with open(self.MODELS_PATH+most_recent, 'rb') as f:
             model = pickle.load(f)
-        print(model)
+        # print(model)
         self.model = model
 
     def predict(self, timelines):
