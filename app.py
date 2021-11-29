@@ -1,4 +1,5 @@
 import os
+from dotenv import load_dotenv
 from flask import Flask, render_template, request, redirect
 from flask.helpers import url_for
 from src.RawDataWrangler import RawDataWrangler
@@ -7,7 +8,9 @@ from src.DataValidator import DataValidator
 from src.WinPredictor import WinPredictor
 import copy
 
-api_key = os.environ.get('RIOT_API_KEY')
+load_dotenv()
+
+api_key = os.environ.get("RIOT_API_KEY")
 
 app = Flask(__name__)
 raw_data_wrangler = RawDataWrangler(API_KEY=api_key)
@@ -18,7 +21,7 @@ win_predictor = WinPredictor()
 win_predictor.load_saved_model()
 
 
-@app.route('/')
+@app.route('/', methods=["GET", "POST"])
 def home_page():
     return render_template('base.html')
 
