@@ -1,6 +1,6 @@
 import os
 from dotenv import load_dotenv
-from flask import Flask, render_template, request, redirect
+from flask import Flask, render_template, request, redirect, send_from_directory
 from flask.helpers import url_for
 from src.RawDataWrangler import RawDataWrangler
 from src.RawDataFormatter import RawDataFormatter
@@ -19,6 +19,12 @@ data_validator = DataValidator()
 win_predictor = WinPredictor()
 
 win_predictor.load_saved_model()
+
+
+@app.route('/riot.txt', methods=["GET", "POST"])
+def riot_page():
+    file_loc = os.getcwd().replace('\\', '/') + '/static/'
+    return send_from_directory(directory=file_loc, filename="riot.txt")
 
 
 @app.route('/', methods=["GET", "POST"])
